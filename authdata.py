@@ -1,5 +1,3 @@
 
-password = 'bizibro1961'
+password = 'bizibro_1961'
 username = 'bizibro.ru'
-
-print(password)
