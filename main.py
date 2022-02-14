@@ -22,6 +22,14 @@ def login(username,password):
         password_input.send_keys(password)
 
         password_input.send_keys(Keys.ENTER)
+        # time.sleep(10)
+        # curent_url = browser.current_url
+        # print(curent_url)
+        # if curent_url == 'https://www.instagram.com/accounts/onetap/?next=%2F':
+        #     save_button = browser.find_elements(By.TAG_NAME,"button")
+        #     save_button.select_by_visible_text("Сохранить данные")
+        # else: pass
+
     except Exception as ex:
         print(ex)
         browser.close()
