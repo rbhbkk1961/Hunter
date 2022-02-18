@@ -53,7 +53,7 @@ def hashtag_search(username,password,hashtag):
             time.sleep(7)
             try:
                 browser.get(f'https://www.instagram.com/explore/tags/{hashtag}/')
-                time.sleep(5)
+                time.sleep(6)
                 for i in range(1,4):
                     browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
                     time.sleep(random.randrange(3,5))
