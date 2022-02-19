@@ -1,4 +1,5 @@
 from selenium import webdriver
+from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from authdata import username, password, hashtag
@@ -28,8 +29,10 @@ class Instagrambot():
         password_input.clear()
         password_input.send_keys(password)
         password_input.send_keys(Keys.ENTER)
+        time.sleep(5)
 
     def hashtag_like (self):
+                browser = self.browser
                 browser.get(f'https://www.instagram.com/explore/tags/{hashtag}/')
                 time.sleep(6)
                 for i in range(1,4):
@@ -52,20 +55,75 @@ class Instagrambot():
     def xpath_exists(self, url):
         browser = self.browser
         try:
-            browser.find_element(By.XPATH,url)
+            browser.find_element(By.XPATH, url)
             exist = True
         except NoSuchElementException:
             exist = False
         return exist
     #ставим лайк на пост по прямой ссылке
-    def put_exactly_like(self, userpost):
+    def put_like_post(self, userpost):
         browser = self.browser
         browser.get(userpost)
         time.sleep(4)
 
-        wrong_userpage = '/html/body/div[1]/section/main/div/div/H2'
+        wrong_userpage = '/html/body/div[1]/section/main/div/div/h2'
         if self.xpath_exists(wrong_userpage):
             print("Такой страницы не существует")
+            self.close_browser()
+        else:
+            print("Пост успешно найден, ставим лайк!")
+            time.sleep(2)
 
+            like_button = "/html/body/div[1]/section/main/div/div[1]/article/div/div[2]/div/div[2]/section[1]/span[1]/button"
+            browser.find_element(By.XPATH,like_button).click()
+
+            print(f"лайк на пост: {userpost} поставлен")
+            self.close_browser()
+
+    def put_many_likes(self, userpage):
+
+        browser = self.browser
+        browser.get(userpage)
+        time.sleep(5)
+        wrong_userpage = '/html/body/div[1]/section/main/div/div/h2'
+        if self.xpath_exists(wrong_userpage):
+            print("Такой страницы не существует")
+            self.close_browser()
+        else:
+            print("Пост успешно найден, ставим лайк!")
+            time.sleep(2)
+
+            post_count = int(browser.find_element(By.XPATH,"//section/main/div/header/section/ul/li[1]/div/span").text)
+            loops_count = int(post_count / 12)
+            print(loops_count)
+            for i in range(0, loops_count):
+                hrefs = browser.find_elements(By.TAG_NAME, "a")
+                hrefs = [item.get_attribute('href') for item in hrefs if "/p/" in item.get_attribute('href')]
+
+                post_urls = []
+                for href in hrefs:
+                    post_urls.append(href)
+
+                browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+                time.sleep(random.randrange(3, 5))
+                print(f"итерация #{i}")
+            file_name = userpage.split("/")[-2]
+
+            with open(f'{file_name}.txt', 'a') as file:
+                for post_url in posts_urls:
+                    file.write(post_url + "\n")
+
+            self.close_browser()
+
+            # like_button = "/html/body/div[1]/section/main/div/div[1]/article/div/div[2]/div/div[2]/section[1]/span[1]/button"
+            # browser.find_element(By.XPATH, like_button).click()
+            # print(f"лайк на пост: {userpost} поставлен")
+
+            self.close_browser()
+
+bot = Instagrambot(username,password)
+bot.login()
+#bot.put_like_post("https://www.instagram.com/p/CZmuqx0jAwf/")
+bot.put_many_likes("https://www.instagram.com/beauty_room_tz/")
 
 
