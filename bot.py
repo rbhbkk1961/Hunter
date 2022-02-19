@@ -95,6 +95,9 @@ class Instagrambot():
 
             post_count = int(browser.find_element(By.XPATH,"//section/main/div/header/section/ul/li[1]/div/span").text)
             loops_count = int(post_count / 12)
+            if loops_count > 4:
+                loops_count = 4
+
             print(loops_count)
             for i in range(0, loops_count):
                 hrefs = browser.find_elements(By.TAG_NAME, "a")
@@ -110,7 +113,7 @@ class Instagrambot():
             file_name = userpage.split("/")[-2]
 
             with open(f'{file_name}.txt', 'a') as file:
-                for post_url in posts_urls:
+                for post_url in post_urls:
                     file.write(post_url + "\n")
 
             self.close_browser()
@@ -118,8 +121,6 @@ class Instagrambot():
             # like_button = "/html/body/div[1]/section/main/div/div[1]/article/div/div[2]/div/div[2]/section[1]/span[1]/button"
             # browser.find_element(By.XPATH, like_button).click()
             # print(f"лайк на пост: {userpost} поставлен")
-
-            self.close_browser()
 
 bot = Instagrambot(username,password)
 bot.login()
