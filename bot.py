@@ -151,26 +151,33 @@ class Instagrambot():
         browser.get(userpage)
         time.sleep(5)
 
-        img_src = "/html/body/div[6]/div[3]/div/article/div/div[1]/div/div/div[2]"
-        video_src = "/html/body/div[6]/div[3]/div/article/div/div[1]/div/div/div/div/div/video"
-        if self.xpath_exists(img_src):
-            img_src_url = browser.find_element(By.XPATH,img_src).get_attribute("src")
-        elif self.xpath_exists(video_src):
-            video_src_url = browser.find_element(By.XPATH,video_src).get_attribute("src")
-        else:
-            print("что то пошло не так")
+        img_and_video = []
+        with open(f'{file_name}_set.txt') as file:
+            urls_list = file.readlines()
 
-        with open(f"{file_name}_set.txt") as file:
-            url_list = file.readlines()
+            for post_url in urls_list[0:6]
+                try:
+                    browser.get(post_url)
+                    time.sleep(2)
+                    img_src = "/html/body/div[6]/div[3]/div/article/div/div[1]/div/div/div[2]"
+                    video_src = "/html/body/div[6]/div[3]/div/article/div/div[1]/div/div/div/div/div/video"
+                    if self.xpath_exists(img_src):
+                        img_src_url = browser.find_element(By.XPATH,img_src).get_attribute("src")
+                        img_and_video.append(img_src_url)
+                    elif self.xpath_exists(video_src):
+                        video_src_url = browser.find_element(By.XPATH,video_src).get_attribute("src")
+                        img_and_video.append(video_src_url)
+                    else:
+                        print("что то пошло не так")
+                        img_and_video.append(f"{post_url}, нет ссылки")
 
-        for post_url in url_list[0:6]:
-            try:
-                browser.get(post_url)
-                time.sleep(3)
+                except Exception as ex:
+                    print(ex)
+                    self.close_browser()
 
-            except Exception as ex:
-                print(ex)
-                self.close_browser()
+        with open('img_and_video.txt','a') as file:
+            for i in img_and_video:
+                file.write( i +"\n")
 
 bot = Instagrambot(username,password)
 bot.login()
