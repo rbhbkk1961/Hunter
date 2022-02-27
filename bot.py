@@ -5,6 +5,7 @@ from selenium.webdriver.common.by import By
 from authdata import username, password, hashtag
 import time
 import random
+import requests
 
 class Instagrambot():
     def __init__(self,username,password):
@@ -155,26 +156,41 @@ class Instagrambot():
         with open(f'{file_name}_set.txt') as file:
             urls_list = file.readlines()
 
-            for post_url in urls_list[0:6]
+            for post_url in urls_list[0:10]:
                 try:
                     browser.get(post_url)
-                    time.sleep(2)
+                    time.sleep(10)
                     img_src = "/html/body/div[6]/div[3]/div/article/div/div[1]/div/div/div[2]"
                     video_src = "/html/body/div[6]/div[3]/div/article/div/div[1]/div/div/div/div/div/video"
+                    post_id = post_url.split("/")[-2]
+
                     if self.xpath_exists(img_src):
                         img_src_url = browser.find_element(By.XPATH,img_src).get_attribute("src")
                         img_and_video.append(img_src_url)
+
+                        #cохраняем изображение
+                        get_img = requests.get(img_src_url)
+                        with open(f"{post_id}_img.jpg", "wb") as img_file:
+                            img_file.write(get_img.content)
+
                     elif self.xpath_exists(video_src):
                         video_src_url = browser.find_element(By.XPATH,video_src).get_attribute("src")
-                        img_and_video.append(video_src_url)
+                        img_and_video.append(video_src_url, stream=True)
+
+                        get_video = requests.get(video_src_url)
+                        with open(f"{post_id}_video.mp4", "wb") as video_file:
+                            for chunk in get_video.iter_content(chunk_size=1024*1024):
+                                if chunk:
+                                    video_file.write(chunk)
                     else:
                         print("что то пошло не так")
                         img_and_video.append(f"{post_url}, нет ссылки")
-
+                    print(f"Контент из поста {post_url} успешно скачан!")
                 except Exception as ex:
                     print(ex)
                     self.close_browser()
 
+            self.close_browser()
         with open('img_and_video.txt','a') as file:
             for i in img_and_video:
                 file.write( i +"\n")
@@ -182,6 +198,7 @@ class Instagrambot():
 bot = Instagrambot(username,password)
 bot.login()
 #bot.put_like_post("https://www.instagram.com/p/CZmuqx0jAwf/")
-bot.put_many_likes("https://www.instagram.com/beauty_room_tz/")
+#bot.put_many_likes("https://www.instagram.com/beauty_room_tz/")
+bot.download_userpage_content("https://www.instagram.com/beauty_room_tz/")
 
 
