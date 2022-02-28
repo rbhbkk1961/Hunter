@@ -125,7 +125,7 @@ class Instagrambot():
     #Ставим лайки на аккаунт
     def put_many_likes(self, userpage):
             browser = self.browser
-            self.get_posts_url(self,userpage)
+            self.get_posts_url(userpage)
             file_name = userpage.split("/")[-2]
             browser.get(userpage)
             time.sleep(5)
@@ -147,7 +147,7 @@ class Instagrambot():
 
     def download_userpage_content(self, userpage):
         browser = self.browser
-        self.get_posts_url(self, userpage)
+        self.get_posts_url(userpage)
         file_name = userpage.split("/")[-2]
         browser.get(userpage)
         time.sleep(5)
@@ -160,32 +160,39 @@ class Instagrambot():
                 try:
                     browser.get(post_url)
                     time.sleep(10)
-                    img_src = "/html/body/div[6]/div[3]/div/article/div/div[1]/div/div/div[2]"
+                    img_src = "//section/main/div/div[1]/article/div/div[1]/div/div/div[1]/img"
                     video_src = "/html/body/div[6]/div[3]/div/article/div/div[1]/div/div/div/div/div/video"
                     post_id = post_url.split("/")[-2]
 
                     if self.xpath_exists(img_src):
+                        print("изображение определено")
                         img_src_url = browser.find_element(By.XPATH,img_src).get_attribute("src")
+                        print(img_src_url)
                         img_and_video.append(img_src_url)
+                        print("сохранение изображения")
 
                         #cохраняем изображение
                         get_img = requests.get(img_src_url)
                         with open(f"{post_id}_img.jpg", "wb") as img_file:
                             img_file.write(get_img.content)
+                        print(f"Контент из поста {post_url} успешно скачан!")
 
                     elif self.xpath_exists(video_src):
+                        print("видео определено")
                         video_src_url = browser.find_element(By.XPATH,video_src).get_attribute("src")
-                        img_and_video.append(video_src_url, stream=True)
+                        img_and_video.append(video_src_url)
+                        print(video_src_url)
 
-                        get_video = requests.get(video_src_url)
+                        get_video = requests.get(video_src_url, stream=True)
                         with open(f"{post_id}_video.mp4", "wb") as video_file:
                             for chunk in get_video.iter_content(chunk_size=1024*1024):
                                 if chunk:
                                     video_file.write(chunk)
+                        print(f"Контент из поста {post_url} успешно скачан!")
                     else:
                         print("что то пошло не так")
                         img_and_video.append(f"{post_url}, нет ссылки")
-                    print(f"Контент из поста {post_url} успешно скачан!")
+
                 except Exception as ex:
                     print(ex)
                     self.close_browser()
