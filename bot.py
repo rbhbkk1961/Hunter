@@ -20,7 +20,7 @@ class Instagrambot():
     def login(self):
         browser = self.browser
         browser.get('https://instagram.com')
-        time.sleep(random.randrange(4, 6))
+        time.sleep(random.randrange(6, 8))
         username_input = browser.find_element(By.NAME, "username")
         username_input.clear()
         username_input.send_keys(username)
@@ -56,8 +56,9 @@ class Instagrambot():
     def xpath_exists(self, url):
         browser = self.browser
         try:
-            browser.find_element(By.XPATH, url)
+            p=browser.find_element(By.XPATH, url)
             exist = True
+            print(f"{p} - Элемент найден")
         except NoSuchElementException:
             exist = False
         return exist
@@ -159,9 +160,12 @@ class Instagrambot():
             for post_url in urls_list[0:10]:
                 try:
                     browser.get(post_url)
+                    print(post_url)
                     time.sleep(10)
                     img_src = "//section/main/div/div[1]/article/div/div[1]/div/div/div[1]/img"
-                    video_src = "/html/body/div[6]/div[3]/div/article/div/div[1]/div/div/div/div/div/video"
+                    # video_src = "/html/body/div[6]/div[3]/div/article/div/div[1]/div/div/div/div/div/video"
+                    video_src = "/html/body/div[1]/section/main/div/div[1]/article/div/div[1]/div/div[1]/div[2]/div/div/div/ul/li[2]/div/div/div/div[1]/div/div/video"
+
                     post_id = post_url.split("/")[-2]
 
                     if self.xpath_exists(img_src):
@@ -179,7 +183,7 @@ class Instagrambot():
 
                     elif self.xpath_exists(video_src):
                         print("видео определено")
-                        video_src_url = browser.find_element(By.XPATH,video_src).get_attribute("src")
+                        video_src_url = browser.find_element(By.XPATH,video_src).get_attribute("poster")
                         img_and_video.append(video_src_url)
                         print(video_src_url)
 
